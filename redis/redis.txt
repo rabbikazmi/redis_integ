@@ -1,0 +1,75 @@
+redis is a key value store, and stores every kind of data as a string. It is a in memory database, and it is very fast. It is used for caching, session management, and real time analytics.
+
+## Installation
+
+```bash
+sudo apt-get install redis-server
+```
+
+## Start Redis Server
+
+```bash
+sudo service redis-server start
+```
+
+## Connect to Redis Server
+
+```bash
+redis-cli
+```
+
+## Basic Commands
+
+```bash
+SET key value
+GET key
+DEL key
+EXISTS key
+KEYS pattern
+FLUSHALL
+```
+
+## Data Types
+
+1. Strings
+2. Lists
+3. Sets
+4. Hashes
+5. Sorted Sets
+
+## Strings
+
+```bash
+SET name "John"
+GET name
+```
+
+## Lists
+
+```bash
+LPUSH list1 "Hello"
+LPUSH list1 "World"
+LRANGE list1 0 -1
+```
+
+## Sets
+
+```bash
+SADD set1 "Hello"
+SADD set1 "World"
+SMEMBERS set1
+```
+
+## Hashes
+
+```bash
+HSET hash1 name "John"
+HSET hash1 age 30
+HGETALL hash1
+```
+
+For JSON, one has to install redisjson module which is a module for Redis that provides JSON support.
+Install it from redis stack server as a docker image.
+
+```bash
+redis-cli --json

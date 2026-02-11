@@ -1,0 +1,4 @@
+1. Whenever scenario.json is generated/updated
+2. It should automatically be saved to Redis (visible in RedisInsight)
+3. Your teammate should always read the latest version
+4. Since the JSON changes, Redis must always reflect the new state
