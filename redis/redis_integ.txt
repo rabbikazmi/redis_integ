@@ -1,0 +1,163 @@
+
+                   REDIS INTEGRATION – SCENARIO STORAGE PIPELINE
+
+TABLE OF CONTENTS
+-----------------
+1. Overview
+2. Setup Instructions
+3. Redis Manager Purpose
+4. Scenario Data Generation
+5. Data Storage Format
+6. Implementation Guide
+
+
+1. OVERVIEW
+
+Purpose:
+    This project uses Redis Stack (running in Docker) as a data bridge between
+    the UI scenario generation system and the RL (Reinforcement Learning) module.
+
+Data Flow:
+    UI (Scenario Generation) 
+        → Redis (Temporary Storage) 
+        → RL Module (Training/Simulation)
+
+Key Points:
+    • Redis is used ONLY as a data bridge, not for permanent storage
+    • Enables decoupling between Scenario system and RL environment
+    • Provides fast in-memory data access for real-time operations
+
+
+2. SETUP INSTRUCTIONS
+
+Step 1: Install Docker Desktop
+-------------------------------
+    Download and install Docker Desktop for your operating system.
+
+
+Step 2: Pull and Run Redis Stack Container
+-------------------------------------------
+    Execute the following commands:
+
+    docker pull redis/redis-stack
+    docker run -d -p 6380:6379 -p 8001:8001 --name redis-stack redis/redis-stack
+
+    Port Mappings:
+        • 6380 → Redis Server (database access)
+        • 8001 → RedisInsight UI (web interface)
+
+
+Step 3: Access RedisInsight UI
+-------------------------------
+    Open in your browser:
+        http://localhost:8001
+
+    Connection Details:
+        • Host: localhost
+        • Port: 6380
+
+
+Step 4: Install Python Redis Library
+-------------------------------------
+    pip install redis
+
+
+3. REDIS MANAGER PURPOSE
+
+The redis_manager.py module is responsible ONLY for:
+
+    ✓ Connecting to Redis server
+    ✓ Receiving scenario data from Scenario class
+    ✓ Converting Python dictionary to JSON
+    ✓ Saving JSON into Redis
+    ✓ Reading JSON back from Redis
+    ✓ Converting JSON back to Python dictionary
+
+Important Notes:
+    ✗ It DOES NOT generate scenario data
+    ✗ It ONLY stores and retrieves it
+
+
+4. SCENARIO DATA GENERATION
+
+Primary Function:
+-----------------
+    Scenario.to_dict_with_entities(entity_manager)
+
+This function performs the following:
+    • Collects scenario metadata
+    • Collects entity positions
+    • Collects zones and paths
+    • Collects entity attributes
+    • Returns a structured Python dictionary
+
+RedisManager Integration:
+    • Uses ONLY to_dict_with_entities() for saving scenarios
+
+Functions NOT Used by RedisManager:
+    ✗ capture_state()
+    ✗ restore_state()
+    ✗ load_from_dict()
+    ✗ load_from_dict_with_entities()
+
+Note: The above functions are internal scenario management utilities.
+
+5. DATA STORAGE FORMAT
+
+Key Format:
+-----------
+    scenario:<scenario_name>
+
+    Example:
+        scenario:Battle_Test
+        scenario:Training_Mission_01
+
+Data Format:
+------------
+    • Stored as proper JSON (not raw Python dict string representation)
+    • JSON enables cross-language compatibility
+    • Structured and easily parseable
+
+Complete Data Flow:
+-------------------
+    [UI]
+      ↓
+    [Scenario.to_dict_with_entities()]
+      ↓
+    [RedisManager.save_scenario()]
+      ↓
+    [Redis Storage: scenario:name → JSON]
+      ↓
+    [RL Module reads from Redis]
+      ↓
+    [Training/Simulation]
+
+
+
+6. IMPLEMENTATION GUIDE
+
+Changes Required in main.py:
+-----------------------------
+
+After scenario generation, add the following:
+
+    from redis_manager import RedisManager
+    
+    # Initialize Redis Manager
+    redis_mgr = RedisManager(host='localhost', port=6380)
+    
+    # Get scenario data
+    scenario_data = scenario.to_dict_with_entities(entity_manager)
+    
+    # Save to Redis
+    redis_mgr.save_scenario(scenario_name, scenario_data)
+    
+    print(f"Scenario '{scenario_name}' saved to Redis successfully")
+
+
+Verification:
+-------------
+    1. Check RedisInsight UI at http://localhost:8001
+    2. Look for key: scenario:<your_scenario_name>
+    3. Verify JSON structure is correct
+
