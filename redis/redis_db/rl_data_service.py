@@ -14,8 +14,8 @@ needed for the AI to make decisions, such as:
 """
 
 from typing import Dict, List, Any
-import numpy as np
-from data.api.reddis_api_db import BaseDB
+import numpy as np 
+from data.api.reddis_api_db import BaseDB   # We use the BaseDB interface so this service can work with ANY database type (Memory, JSON, Redis, etc.)
 
 class RLDataService:
     """

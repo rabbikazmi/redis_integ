@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Iterable, Tuple
 
 import redis
 
-from data.api.reddis_api_db import BaseDB
+from data.api.reddis_api_db import BaseDB  # Import the abstract base class
 
 
 class RedisDB(BaseDB):
